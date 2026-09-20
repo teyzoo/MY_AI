@@ -1,10 +1,9 @@
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-import os
+from urllib.parse import urlparse
 import json
-
+import os
 import httpx
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -18,100 +17,211 @@ AI_MODEL = os.getenv(
     "qwen2.5:3b"
 )
 
-app = FastAPI(title="MY AI")
+HOST = "0.0.0.0"
+PORT = int(os.getenv("PORT", "8000"))
 
 
-@app.get("/")
-async def index():
-    return FileResponse(BASE_DIR / "index.html")
+class Handler(BaseHTTPRequestHandler):
 
+    def send_json(self, data, status=200):
+        body = json.dumps(
+            data,
+            ensure_ascii=False
+        ).encode("utf-8")
 
-@app.get("/api/health")
-async def health():
-    return {
-        "status": "ok",
-        "model": AI_MODEL
-    }
+        self.send_response(status)
+        self.send_header(
+            "Content-Type",
+            "application/json; charset=utf-8"
+        )
+        self.send_header(
+            "Content-Length",
+            str(len(body))
+        )
+        self.send_header(
+            "Access-Control-Allow-Origin",
+            "*"
+        )
+        self.end_headers()
 
+        self.wfile.write(body)
 
-@app.post("/api/chat")
-async def chat(request: Request):
-    try:
-        data = await request.json()
-    except Exception:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid JSON"
+    def do_GET(self):
+        path = urlparse(self.path).path
+
+        if path == "/":
+            file = BASE_DIR / "index.html"
+
+            if not file.exists():
+                self.send_json(
+                    {"error": "index.html not found"},
+                    404
+                )
+                return
+
+            body = file.read_bytes()
+
+            self.send_response(200)
+            self.send_header(
+                "Content-Type",
+                "text/html; charset=utf-8"
+            )
+            self.send_header(
+                "Content-Length",
+                str(len(body))
+            )
+            self.end_headers()
+
+            self.wfile.write(body)
+            return
+
+        if path == "/api/health":
+            self.send_json({
+                "status": "ok",
+                "model": AI_MODEL
+            })
+            return
+
+        self.send_json(
+            {"error": "Not found"},
+            404
         )
 
-    message = str(data.get("message", "")).strip()
+    def do_POST(self):
+        path = urlparse(self.path).path
 
-    if not message:
-        raise HTTPException(
-            status_code=400,
-            detail="Message is empty"
-        )
+        if path != "/api/chat":
+            self.send_json(
+                {"error": "Not found"},
+                404
+            )
+            return
 
-    prompt = f"""
+        try:
+            length = int(
+                self.headers.get(
+                    "Content-Length",
+                    "0"
+                )
+            )
+
+            raw = self.rfile.read(length)
+            data = json.loads(raw.decode("utf-8"))
+
+        except Exception:
+            self.send_json(
+                {"error": "Invalid JSON"},
+                400
+            )
+            return
+
+        message = str(
+            data.get("message", "")
+        ).strip()
+
+        if not message:
+            self.send_json(
+                {"error": "Message is empty"},
+                400
+            )
+            return
+
+        prompt = f"""
 You are MY AI.
 
-You are a general-purpose AI assistant and coding agent.
+You are a general-purpose AI assistant
+and coding agent.
 
 You can:
 - answer questions;
-- write Python, JavaScript, HTML, CSS and other code;
+- write code;
 - explain code;
-- design applications;
-- help create complete projects;
-- find and fix programming errors;
-- create project structures;
-- help build websites, bots and applications.
+- create applications;
+- create websites;
+- create Telegram bots;
+- debug programming errors;
+- design project structures;
+- help build complete software projects.
 
-When the user asks to create software, provide practical implementation
-and complete code when appropriate.
+Give practical answers and complete code
+when appropriate.
 
 User request:
 
 {message}
 """
 
-    try:
-        async with httpx.AsyncClient(timeout=120) as client:
-            response = await client.post(
-                f"{OLLAMA_URL}/api/generate",
-                json={
-                    "model": AI_MODEL,
-                    "prompt": prompt,
-                    "stream": False
-                }
-            )
+        try:
+            with httpx.Client(timeout=120) as client:
 
-            response.raise_for_status()
+                response = client.post(
+                    f"{OLLAMA_URL}/api/generate",
+                    json={
+                        "model": AI_MODEL,
+                        "prompt": prompt,
+                        "stream": False
+                    }
+                )
 
-            result = response.json()
-            answer = result.get("response", "").strip()
+                response.raise_for_status()
+
+                result = response.json()
+
+            answer = str(
+                result.get(
+                    "response",
+                    ""
+                )
+            ).strip()
 
             if not answer:
                 answer = "Модель не вернула ответ."
 
-            return {
+            self.send_json({
                 "answer": answer
-            }
+            })
 
-    except httpx.HTTPError as exc:
-        raise HTTPException(
-            status_code=503,
-            detail="AI-модель пока не подключена."
-        ) from exc
+        except Exception as error:
+
+            self.send_json({
+                "error": (
+                    "AI-модель пока не подключена."
+                )
+            }, 503)
+
+            print(
+                "AI error:",
+                error
+            )
+
+    def log_message(self, format, *args):
+        print(
+            f"[MY AI] {format % args}"
+        )
+
+
+def main():
+    server = ThreadingHTTPServer(
+        (HOST, PORT),
+        Handler
+    )
+
+    print(
+        f"MY AI запущен на "
+        f"http://{HOST}:{PORT}"
+    )
+
+    print(
+        f"AI model: {AI_MODEL}"
+    )
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nMY AI остановлен.")
+    finally:
+        server.server_close()
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=False
-    )
-    
+    main()
