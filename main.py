@@ -3,7 +3,9 @@ from pathlib import Path
 from urllib.parse import urlparse
 import json
 import os
+
 import httpx
+
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -11,7 +13,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 GEMINI_MODEL = os.getenv(
     "GEMINI_MODEL",
-    "gemini-2.5-flash"
+    "gemini-3.6-flash"
 )
 
 GEMINI_URL = (
@@ -23,6 +25,27 @@ HOST = "0.0.0.0"
 PORT = int(os.getenv("PORT", "8000"))
 
 
+SYSTEM_PROMPT = """
+You are MY AI, a general-purpose AI assistant and coding agent.
+
+Your abilities:
+- answer questions;
+- write Python, JavaScript, HTML, CSS and other code;
+- explain code;
+- create websites;
+- create Telegram bots;
+- design applications;
+- debug programming errors;
+- create project structures;
+- help build complete software projects.
+
+When the user asks to create software, provide practical
+implementation and complete code when appropriate.
+
+Be clear, useful and direct.
+"""
+
+
 class Handler(BaseHTTPRequestHandler):
 
     def send_json(self, data, status=200):
@@ -32,18 +55,22 @@ class Handler(BaseHTTPRequestHandler):
         ).encode("utf-8")
 
         self.send_response(status)
+
         self.send_header(
             "Content-Type",
             "application/json; charset=utf-8"
         )
+
         self.send_header(
             "Content-Length",
             str(len(body))
         )
+
         self.send_header(
             "Access-Control-Allow-Origin",
             "*"
         )
+
         self.end_headers()
 
         self.wfile.write(body)
@@ -56,7 +83,9 @@ class Handler(BaseHTTPRequestHandler):
 
             if not file.exists():
                 self.send_json(
-                    {"error": "index.html not found"},
+                    {
+                        "error": "index.html not found"
+                    },
                     404
                 )
                 return
@@ -64,17 +93,21 @@ class Handler(BaseHTTPRequestHandler):
             body = file.read_bytes()
 
             self.send_response(200)
+
             self.send_header(
                 "Content-Type",
                 "text/html; charset=utf-8"
             )
+
             self.send_header(
                 "Content-Length",
                 str(len(body))
             )
+
             self.end_headers()
 
             self.wfile.write(body)
+
             return
 
         if path == "/api/health":
@@ -84,10 +117,13 @@ class Handler(BaseHTTPRequestHandler):
                 "model": GEMINI_MODEL,
                 "api_key": bool(GEMINI_API_KEY)
             })
+
             return
 
         self.send_json(
-            {"error": "Not found"},
+            {
+                "error": "Not found"
+            },
             404
         )
 
@@ -96,14 +132,18 @@ class Handler(BaseHTTPRequestHandler):
 
         if path != "/api/chat":
             self.send_json(
-                {"error": "Not found"},
+                {
+                    "error": "Not found"
+                },
                 404
             )
             return
 
         if not GEMINI_API_KEY:
             self.send_json(
-                {"error": "GEMINI_API_KEY не установлен"},
+                {
+                    "error": "GEMINI_API_KEY не установлен"
+                },
                 500
             )
             return
@@ -124,47 +164,35 @@ class Handler(BaseHTTPRequestHandler):
 
         except Exception:
             self.send_json(
-                {"error": "Invalid JSON"},
+                {
+                    "error": "Invalid JSON"
+                },
                 400
             )
             return
 
         message = str(
-            data.get("message", "")
+            data.get(
+                "message",
+                ""
+            )
         ).strip()
 
         if not message:
             self.send_json(
-                {"error": "Message is empty"},
+                {
+                    "error": "Message is empty"
+                },
                 400
             )
             return
 
-        prompt = f"""
-You are MY AI.
-
-You are a general-purpose AI assistant
-and coding agent.
-
-You can:
-- answer questions;
-- write Python, JavaScript, HTML and CSS;
-- create websites;
-- create Telegram bots;
-- design applications;
-- debug programming errors;
-- create project structures;
-- explain code;
-- help build complete software projects.
-
-When the user asks you to create software,
-provide practical implementation and complete
-code when appropriate.
-
-User request:
-
-{message}
-"""
+        prompt = (
+            SYSTEM_PROMPT
+            + "\n\n"
+            + "User request:\n"
+            + message
+        )
 
         payload = {
             "contents": [
@@ -179,7 +207,9 @@ User request:
         }
 
         try:
-            with httpx.Client(timeout=120) as client:
+            with httpx.Client(
+                timeout=120
+            ) as client:
 
                 response = client.post(
                     GEMINI_URL,
@@ -201,6 +231,7 @@ User request:
             answer = ""
 
             if candidates:
+
                 content = candidates[0].get(
                     "content",
                     {}
@@ -211,16 +242,22 @@ User request:
                     []
                 )
 
-                if parts:
-                    answer = parts[0].get(
+                for part in parts:
+
+                    text = part.get(
                         "text",
                         ""
                     )
 
+                    if text:
+                        answer += text
+
             answer = answer.strip()
 
             if not answer:
-                answer = "Gemini не вернул ответ."
+                answer = (
+                    "Gemini не вернул текстовый ответ."
+                )
 
             self.send_json({
                 "answer": answer
@@ -230,30 +267,49 @@ User request:
 
             try:
                 error_data = error.response.json()
-                message = error_data.get(
-                    "error",
-                    {}
-                ).get(
-                    "message",
+
+                error_message = (
+                    error_data
+                    .get("error", {})
+                    .get(
+                        "message",
+                        "Ошибка Gemini API"
+                    )
+                )
+
+            except Exception:
+                error_message = (
                     "Ошибка Gemini API"
                 )
-            except Exception:
-                message = "Ошибка Gemini API"
 
-            self.send_json({
-                "error": message
-            }, 502)
+            print(
+                "Gemini API error:",
+                error_message
+            )
+
+            self.send_json(
+                {
+                    "error": error_message
+                },
+                502
+            )
 
         except Exception as error:
 
             print(
-                "Gemini error:",
+                "Gemini connection error:",
                 error
             )
 
-            self.send_json({
-                "error": "Не удалось подключиться к Gemini API"
-            }, 503)
+            self.send_json(
+                {
+                    "error": (
+                        "Не удалось подключиться "
+                        "к Gemini API"
+                    )
+                },
+                503
+            )
 
     def log_message(self, format, *args):
         print(
@@ -262,6 +318,7 @@ User request:
 
 
 def main():
+
     server = ThreadingHTTPServer(
         (HOST, PORT),
         Handler
@@ -285,9 +342,13 @@ def main():
         server.serve_forever()
 
     except KeyboardInterrupt:
-        print("\nMY AI остановлен.")
+
+        print(
+            "\nMY AI остановлен."
+        )
 
     finally:
+
         server.server_close()
 
 
