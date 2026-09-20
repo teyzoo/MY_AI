@@ -7,14 +7,16 @@ import httpx
 
 BASE_DIR = Path(__file__).resolve().parent
 
-OLLAMA_URL = os.getenv(
-    "OLLAMA_URL",
-    "http://127.0.0.1:11434"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+GEMINI_MODEL = os.getenv(
+    "GEMINI_MODEL",
+    "gemini-2.5-flash"
 )
 
-AI_MODEL = os.getenv(
-    "AI_MODEL",
-    "qwen2.5:3b"
+GEMINI_URL = (
+    "https://generativelanguage.googleapis.com/v1beta/models/"
+    f"{GEMINI_MODEL}:generateContent"
 )
 
 HOST = "0.0.0.0"
@@ -78,7 +80,9 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/health":
             self.send_json({
                 "status": "ok",
-                "model": AI_MODEL
+                "ai": "gemini",
+                "model": GEMINI_MODEL,
+                "api_key": bool(GEMINI_API_KEY)
             })
             return
 
@@ -97,6 +101,13 @@ class Handler(BaseHTTPRequestHandler):
             )
             return
 
+        if not GEMINI_API_KEY:
+            self.send_json(
+                {"error": "GEMINI_API_KEY не установлен"},
+                500
+            )
+            return
+
         try:
             length = int(
                 self.headers.get(
@@ -106,7 +117,10 @@ class Handler(BaseHTTPRequestHandler):
             )
 
             raw = self.rfile.read(length)
-            data = json.loads(raw.decode("utf-8"))
+
+            data = json.loads(
+                raw.decode("utf-8")
+            )
 
         except Exception:
             self.send_json(
@@ -134,65 +148,112 @@ and coding agent.
 
 You can:
 - answer questions;
-- write code;
-- explain code;
-- create applications;
+- write Python, JavaScript, HTML and CSS;
 - create websites;
 - create Telegram bots;
+- design applications;
 - debug programming errors;
-- design project structures;
+- create project structures;
+- explain code;
 - help build complete software projects.
 
-Give practical answers and complete code
-when appropriate.
+When the user asks you to create software,
+provide practical implementation and complete
+code when appropriate.
 
 User request:
 
 {message}
 """
 
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": prompt
+                        }
+                    ]
+                }
+            ]
+        }
+
         try:
             with httpx.Client(timeout=120) as client:
 
                 response = client.post(
-                    f"{OLLAMA_URL}/api/generate",
-                    json={
-                        "model": AI_MODEL,
-                        "prompt": prompt,
-                        "stream": False
-                    }
+                    GEMINI_URL,
+                    params={
+                        "key": GEMINI_API_KEY
+                    },
+                    json=payload
                 )
 
                 response.raise_for_status()
 
                 result = response.json()
 
-            answer = str(
-                result.get(
-                    "response",
-                    ""
+            candidates = result.get(
+                "candidates",
+                []
+            )
+
+            answer = ""
+
+            if candidates:
+                content = candidates[0].get(
+                    "content",
+                    {}
                 )
-            ).strip()
+
+                parts = content.get(
+                    "parts",
+                    []
+                )
+
+                if parts:
+                    answer = parts[0].get(
+                        "text",
+                        ""
+                    )
+
+            answer = answer.strip()
 
             if not answer:
-                answer = "Модель не вернула ответ."
+                answer = "Gemini не вернул ответ."
 
             self.send_json({
                 "answer": answer
             })
 
-        except Exception as error:
+        except httpx.HTTPStatusError as error:
+
+            try:
+                error_data = error.response.json()
+                message = error_data.get(
+                    "error",
+                    {}
+                ).get(
+                    "message",
+                    "Ошибка Gemini API"
+                )
+            except Exception:
+                message = "Ошибка Gemini API"
 
             self.send_json({
-                "error": (
-                    "AI-модель пока не подключена."
-                )
-            }, 503)
+                "error": message
+            }, 502)
+
+        except Exception as error:
 
             print(
-                "AI error:",
+                "Gemini error:",
                 error
             )
+
+            self.send_json({
+                "error": "Не удалось подключиться к Gemini API"
+            }, 503)
 
     def log_message(self, format, *args):
         print(
@@ -212,13 +273,20 @@ def main():
     )
 
     print(
-        f"AI model: {AI_MODEL}"
+        f"AI: Gemini / {GEMINI_MODEL}"
+    )
+
+    print(
+        "API key:",
+        "OK" if GEMINI_API_KEY else "NOT SET"
     )
 
     try:
         server.serve_forever()
+
     except KeyboardInterrupt:
         print("\nMY AI остановлен.")
+
     finally:
         server.server_close()
 
