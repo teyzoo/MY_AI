@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MY AI</title>
+
+    <style>
+        :root {
+            --bg: #05080d;
+            --bg2: #080f17;
+            --panel: rgba(10, 18, 27, 0.92);
+            --panel2: #0e1924;
+            --text: #eefaff;
+            --muted: #8297a9;
+            --border: #1b3447;
+            --blue: #61d8ff;
+            --blue2: #0da7df;
+            --user: #10374d;
+            --danger: #ff6075;
+            --shadow: 0 0 35px rgba(72, 204, 255, 0.12);
+        }
+
+        :root.light {
+            --bg: #f4fbff;
+            --bg2: #eaf7fd;
+            --panel: rgba(255, 255, 255, 0.94);
+            --panel2: #eef9fd;
+            --text: #07131d;
+            --muted: #607785;
+            --border: #c9e1ec;
+            --blue: #069bd1;
+            --blue2: #0879a5;
+            --user: #d9f3fc;
+            --shadow: 0 0 35px rgba(0, 145, 200, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(
+                    circle at 50% -10%,
+                    rgba(70, 210, 255, 0.18),
+                    transparent 38%
+                ),
+                linear-gradient(
+                    180deg,
+                    var(--bg),
+                    var(--bg2)
+                );
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        button,
+        textarea,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+
+        header {
+            height: 68px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 22px;
+
+            border-bottom: 1px solid var(--border);
+
+            background: var(--panel);
+
+            backdrop-filter: blur(20px);
+
+            position: sticky;
+            top: 0;
+
+            z-index: 20;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            font-size: 18px;
+            font-weight: 900;
+
+            letter-spacing: 0.5px;
+        }
+
+        .logo {
+            width: 37px;
+            height: 37px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 12px;
+
+            color: #001017;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    #b6f2ff
+                );
+
+            box-shadow:
+                0 0 25px
+                rgba(80, 215, 255, 0.35);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-button {
+            border: 1px solid var(--border);
+
+            background: var(--panel2);
+
+            color: var(--text);
+
+            border-radius: 12px;
+
+            padding: 9px 12px;
+
+            transition: 0.2s;
+        }
+
+        .header-button:hover {
+            border-color: var(--blue);
+
+            box-shadow: var(--shadow);
+        }
+
+        /* MAIN */
+
+        main {
+            width: min(1100px, 100%);
+
+            flex: 1;
+
+            margin: 0 auto;
+
+            padding:
+                35px 18px
+                25px;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HERO */
+
+        .hero {
+            text-align: center;
+
+            margin:
+                auto
+                0
+                30px;
+        }
+
+        .hero h1 {
+            margin: 0;
+
+            font-size:
+                clamp(
+                    38px,
+                    8vw,
+                    70px
+                );
+
+            line-height: 1;
+
+            letter-spacing: -3px;
+        }
+
+        .hero h1 span {
+            color: var(--blue);
+
+            text-shadow:
+                0 0 35px
+                rgba(80, 215, 255, 0.35);
+        }
+
+        .hero p {
+            margin:
+                18px auto
+                0;
+
+            max-width: 650px;
+
+            color: var(--muted);
+
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* MODES */
+
+        .modes {
+            display: flex;
+            justify-content: center;
+
+            gap: 8px;
+
+            margin-bottom: 16px;
+        }
+
+        .mode {
+            border: 1px solid var(--border);
+
+            color: var(--muted);
+
+            background: var(--panel);
+
+            border-radius: 12px;
+
+            padding: 9px 14px;
+
+            transition: 0.2s;
+        }
+
+        .mode.active {
+            color: var(--text);
+
+            border-color: var(--blue);
+
+            background:
+                rgba(40, 180, 230, 0.10);
+
+            box-shadow:
+                0 0 20px
+                rgba(80, 215, 255, 0.08);
+        }
+
+        /* CHAT */
+
+        #chat {
+            display: none;
+
+            flex-direction: column;
+
+            gap: 14px;
+
+            margin-bottom: 18px;
+        }
+
+        .message {
+            max-width: 88%;
+
+            padding:
+                14px 17px;
+
+            border-radius: 18px;
+
+            border: 1px solid var(--border);
+
+            line-height: 1.6;
+
+            white-space: pre-wrap;
+
+            overflow-wrap: anywhere;
+        }
+
+        .message.user {
+            align-self: flex-end;
+
+            background: var(--user);
+        }
+
+        .message.ai {
+            align-self: flex-start;
+
+            background: var(--panel);
+
+            box-shadow: var(--shadow);
+        }
+
+        .message.error {
+            border-color:
+                rgba(255, 96, 117, 0.5);
+
+            color:
+                var(--danger);
+        }
+
+        /* COMPOSER */
+
+        .composer {
+            width: 100%;
+
+            border: 1px solid var(--border);
+
+            background: var(--panel);
+
+            border-radius: 22px;
+
+            padding: 12px;
+
+            box-shadow: var(--shadow);
+        }
+
+        textarea {
+            width: 100%;
+
+            min-height: 85px;
+            max-height: 260px;
+
+            resize: vertical;
+
+            border: 0;
+            outline: 0;
+
+            background: transparent;
+
+            color: var(--text);
+
+            padding:
+                8px;
+
+            line-height: 1.5;
+        }
+
+        textarea::placeholder {
+            color: var(--muted);
+        }
+
+        .composer-bottom {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 10px;
+        }
+
+        .hint {
+            color: var(--muted);
+
+            font-size: 12px;
+
+            padding-left: 8px;
+        }
+
+        .send {
+            border: 0;
+
+            border-radius: 14px;
+
+            padding:
+                11px 19px;
+
+            font-weight: 900;
+
+            color: #001018;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #b7f2ff,
+                    var(--blue)
+                );
+
+            box-shadow:
+                0 0 22px
+                rgba(80, 215, 255, 0.22);
+
+            transition: 0.2s;
+        }
+
+        .send:hover {
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 0 30px
+                rgba(80, 215, 255, 0.35);
+        }
+
+        .send:disabled {
+            opacity: 0.55;
+
+            cursor: wait;
+
+            transform: none;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            padding:
+                13px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 650px) {
+
+            header {
+                padding: 0 12px;
+            }
+
+            main {
+                padding:
+                    24px 12px
+                    12px;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .header-button {
+                padding:
+                    8px 10px;
+            }
+
+            .hero {
+                margin-top: auto;
+            }
+
+            .hero h1 {
+                letter-spacing: -2px;
+            }
+
+            .message {
+                max-width: 95%;
+            }
+
+            .hint {
+                display: none;
+            }
+
+            .composer-bottom {
+                justify-content: flex-end;
+            }
+
+            .modes {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header>
+
+        <div class="brand">
+
+            <div class="logo">
+                ✦
+            </div>
+
+            <span>
+                MY AI
+            </span>
+
+        </div>
+
+        <div class="header-buttons">
+
+            <button
+                class="header-button"
+                onclick="newChat()"
+            >
+                ＋ Новый чат
+            </button>
+
+            <button
+                class="header-button"
+                id="themeButton"
+                onclick="toggleTheme()"
+            >
+                ☾
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <section
+            class="hero"
+            id="hero"
+        >
+
+            <h1>
+                Привет, я
+                <span>MY AI</span>
+            </h1>
+
+            <p>
+                AI для общения, программирования
+                и создания приложений по твоему описанию.
+            </p>
+
+        </section>
+
+
+        <div class="modes">
+
+            <button
+                class="mode active"
+                id="chatMode"
+                onclick="setMode('chat')"
+            >
+                💬 Чат
+            </button>
+
+            <button
+                class="mode"
+                id="codeMode"
+                onclick="setMode('code')"
+            >
+                💻 Создать приложение
+            </button>
+
+        </div>
+
+
+        <section
+            id="chat"
+        ></section>
+
+
+        <section class="composer">
+
+            <textarea
+                id="input"
+                placeholder="Напиши вопрос или опиши приложение, которое хочешь создать..."
+            ></textarea>
+
+
+            <div class="composer-bottom">
+
+                <div class="hint">
+                    Ctrl/⌘ + Enter — отправить
+                </div>
+
+                <button
+                    class="send"
+                    id="sendButton"
+                    onclick="sendMessage()"
+                >
+                    Отправить ➜
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        MY AI · AI Coding Agent
+    </footer>
+
+</div>
+
+
+<script>
+
+    const root =
+        document.documentElement;
+
+    const input =
+        document.getElementById("input");
+
+    const chat =
+        document.getElementById("chat");
+
+    const hero =
+        document.getElementById("hero");
+
+    const sendButton =
+        document.getElementById("sendButton");
+
+    const chatMode =
+        document.getElementById("chatMode");
+
+    const codeMode =
+        document.getElementById("codeMode");
+
+    let currentMode = "chat";
+
+
+    /* THEME */
+
+    function applyTheme(theme) {
+
+        root.classList.toggle(
+            "light",
+            theme === "light"
+        );
+
+        document.getElementById(
+            "themeButton"
+        ).textContent =
+            theme === "light"
+                ? "☀"
+                : "☾";
+
+        localStorage.setItem(
+            "myai-theme",
+            theme
+        );
+    }
+
+
+    function toggleTheme() {
+
+        const light =
+            root.classList.contains("light");
+
+        applyTheme(
+            light
+                ? "dark"
+                : "light"
+        );
+    }
+
+
+    /* MODE */
+
+    function setMode(mode) {
+
+        currentMode = mode;
+
+        chatMode.classList.toggle(
+            "active",
+            mode === "chat"
+        );
+
+        codeMode.classList.toggle(
+            "active",
+            mode === "code"
+        );
+
+        if (mode === "code") {
+
+            input.placeholder =
+                "Опиши приложение: например, «создай сайт магазина с авторизацией и админ-панелью»...";
+
+        } else {
+
+            input.placeholder =
+                "Напиши вопрос или попроси MY AI помочь с кодом...";
+
+        }
+
+        input.focus();
+    }
+
+
+    /* MESSAGE */
+
+    function addMessage(
+        text,
+        role
+    ) {
+
+        chat.style.display =
+            "flex";
+
+        hero.style.display =
+            "none";
+
+        const element =
+            document.createElement(
+                "div"
+            );
+
+        element.className =
+            "message " + role;
+
+        element.textContent =
+            text;
+
+        chat.appendChild(
+            element
+        );
+
+        element.scrollIntoView({
+            behavior: "smooth",
+            block: "end"
+        });
+
+        return element;
+    }
+
+
+    /* SEND */
+
+    async function sendMessage() {
+
+        const message =
+            input.value.trim();
+
+        if (!message) {
+            return;
+        }
+
+        input.value = "";
+
+        addMessage(
+            message,
+            "user"
+        );
+
+        const thinking =
+            addMessage(
+                "MY AI думает…",
+                "ai"
+            );
+
+        sendButton.disabled =
+            true;
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/chat",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            message:
+                                currentMode === "code"
+                                    ? "Режим создания приложения. " + message
+                                    : message
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.detail ||
+                    "Ошибка сервера"
+                );
+
+            }
+
+
+            thinking.textContent =
+                data.answer ||
+                "MY AI не вернул ответ.";
+
+        }
+
+        catch (error) {
+
+            thinking.classList.add(
+                "error"
+            );
+
+            thinking.textContent =
+                "Ошибка: " +
+                error.message;
+
+        }
+
+        finally {
+
+            sendButton.disabled =
+                false;
+
+        }
+    }
+
+
+    /* NEW CHAT */
+
+    function newChat() {
+
+        chat.innerHTML = "";
+
+        chat.style.display =
+            "none";
+
+        hero.style.display =
+            "block";
+
+        input.value = "";
+
+        input.focus();
+    }
+
+
+    /* KEYBOARD */
+
+    input.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                (event.ctrlKey ||
+                 event.metaKey) &&
+                event.key === "Enter"
+            ) {
+
+                event.preventDefault();
+
+                sendMessage();
+            }
+
+        }
+    );
+
+
+    /* START */
+
+    applyTheme(
+        localStorage.getItem(
+            "myai-theme"
+        ) || "dark"
+    );
+
+</script>
+
+</body>
+  </html>
