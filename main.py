@@ -1,10 +1,10 @@
 from pathlib import Path
 import os
+import json
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -21,10 +21,6 @@ AI_MODEL = os.getenv(
 app = FastAPI(title="MY AI")
 
 
-class ChatRequest(BaseModel):
-    message: str
-
-
 @app.get("/")
 async def index():
     return FileResponse(BASE_DIR / "index.html")
@@ -39,8 +35,16 @@ async def health():
 
 
 @app.post("/api/chat")
-async def chat(request: ChatRequest):
-    message = request.message.strip()
+async def chat(request: Request):
+    try:
+        data = await request.json()
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid JSON"
+        )
+
+    message = str(data.get("message", "")).strip()
 
     if not message:
         raise HTTPException(
@@ -61,9 +65,9 @@ You can:
 - help create complete projects;
 - find and fix programming errors;
 - create project structures;
-- help the user build websites, bots and applications.
+- help build websites, bots and applications.
 
-When the user asks to create software, give practical implementation
+When the user asks to create software, provide practical implementation
 and complete code when appropriate.
 
 User request:
@@ -84,9 +88,8 @@ User request:
 
             response.raise_for_status()
 
-            data = response.json()
-
-            answer = data.get("response", "").strip()
+            result = response.json()
+            answer = result.get("response", "").strip()
 
             if not answer:
                 answer = "Модель не вернула ответ."
@@ -98,10 +101,7 @@ User request:
     except httpx.HTTPError as exc:
         raise HTTPException(
             status_code=503,
-            detail=(
-                "AI-модель пока не подключена. "
-                "Сначала запусти локальный AI-сервер."
-            )
+            detail="AI-модель пока не подключена."
         ) from exc
 
 
@@ -113,4 +113,5 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=False
-                                    )
+    )
+    
