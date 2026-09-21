@@ -1,578 +1,800 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>MY AI</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #020711;
-            --panel: #07111f;
-            --panel2: #0b192b;
-            --border: #183553;
-            --text: #f5f9ff;
-            --muted: #7f96b2;
-            --blue: #168cff;
-            --blue2: #00c2ff;
-            --danger: #ff4d67;
-        }
-
-        body.light {
-            --bg: #eef5fc;
-            --panel: #ffffff;
-            --panel2: #f4f8fd;
-            --border: #cbd9e8;
-            --text: #07111f;
-            --muted: #60748b;
-            --blue: #087cff;
-            --blue2: #009de0;
-        }
-
-        html,
-        body {
-            margin: 0;
-            width: 100%;
-            min-height: 100%;
-        }
-
-        body {
-            min-height: 100vh;
-            background:
-                radial-gradient(
-                    circle at 50% -10%,
-                    rgba(0, 150, 255, 0.20),
-                    transparent 38%
-                ),
-                var(--bg);
-            color: var(--text);
-            font-family:
-                Inter,
-                Arial,
-                sans-serif;
-            transition: background 0.25s, color 0.25s;
-        }
-
-        button,
-        textarea {
-            font: inherit;
-        }
-
-        button {
-            border: 0;
-            cursor: pointer;
-        }
-
-        .app {
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* SIDEBAR */
-
-        .sidebar {
-            width: 260px;
-            min-width: 260px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 20;
-
-            display: flex;
-            flex-direction: column;
-
-            padding: 18px;
-
-            background: rgba(3, 10, 20, 0.94);
-            border-right: 1px solid var(--border);
-
-            backdrop-filter: blur(18px);
-        }
-
-        body.light .sidebar {
-            background: rgba(255, 255, 255, 0.94);
-        }
-
-        .logo {
-            font-size: 25px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            margin-bottom: 25px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#05070d">
+
+<title>TEYZ.AI — AI Platform</title>
+
+<style>
+:root {
+    --bg: #05070d;
+    --bg-soft: #090d16;
+    --panel: rgba(12, 17, 29, 0.78);
+    --panel-solid: #0d1320;
+    --border: rgba(126, 165, 255, 0.13);
+    --text: #f5f8ff;
+    --muted: #8d98ad;
+    --blue: #4d8dff;
+    --blue-light: #79adff;
+    --blue-soft: rgba(77, 141, 255, 0.13);
+    --danger: #ff5f6d;
+    --shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] {
+    --bg: #f5f8fc;
+    --bg-soft: #edf2f9;
+    --panel: rgba(255, 255, 255, 0.82);
+    --panel-solid: #ffffff;
+    --border: rgba(34, 70, 120, 0.12);
+    --text: #101725;
+    --muted: #657086;
+    --blue: #236cff;
+    --blue-light: #4d8dff;
+    --blue-soft: rgba(35, 108, 255, 0.09);
+    --shadow: 0 25px 80px rgba(40, 70, 110, 0.13);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 70% -10%,
+            rgba(55, 120, 255, 0.17),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 0% 80%,
+            rgba(45, 91, 210, 0.08),
+            transparent 30%
+        ),
+        var(--bg);
+
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+button,
+textarea,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app {
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 270px;
+
+    padding: 22px 16px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(10, 15, 25, 0.92),
+            rgba(5, 8, 14, 0.82)
+        );
 
-        .logo span {
-            color: var(--blue2);
-        }
+    border-right: 1px solid var(--border);
 
-        .new-chat {
-            width: 100%;
-            padding: 13px 15px;
+    backdrop-filter: blur(24px);
 
-            border-radius: 12px;
+    z-index: 50;
+}
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--blue),
-                    var(--blue2)
-                );
+[data-theme="light"] .sidebar {
+    background: rgba(255, 255, 255, 0.88);
+}
 
-            color: white;
-            font-weight: 800;
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
 
-            box-shadow:
-                0 8px 25px rgba(0, 150, 255, 0.20);
-        }
+    padding: 4px 10px 28px;
+}
 
-        .new-chat:hover {
-            filter: brightness(1.1);
-        }
+.logo-mark {
+    width: 38px;
+    height: 38px;
 
-        .mode-title {
-            margin: 25px 5px 10px;
+    border-radius: 12px;
 
-            color: var(--muted);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
+    display: grid;
+    place-items: center;
 
-        .mode {
-            width: 100%;
-            padding: 12px;
+    background:
+        linear-gradient(
+            135deg,
+            #6da5ff,
+            #236cff
+        );
 
-            margin-bottom: 7px;
+    box-shadow:
+        0 0 30px rgba(77, 141, 255, 0.35);
 
-            border-radius: 10px;
+    font-weight: 900;
+    color: white;
+}
 
-            background: transparent;
-            color: var(--muted);
+.logo-text {
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+}
 
-            text-align: left;
-        }
+.logo-text span {
+    color: var(--blue-light);
+}
 
-        .mode:hover,
-        .mode.active {
-            background: var(--panel2);
-            color: var(--text);
-        }
+.new-project {
+    width: 100%;
 
-        .mode.active {
-            box-shadow:
-                inset 2px 0 0 var(--blue2);
-        }
+    border: 0;
+    border-radius: 14px;
 
-        .theme {
-            width: 100%;
+    padding: 13px 15px;
 
-            margin-top: auto;
+    color: white;
 
-            padding: 12px;
+    background:
+        linear-gradient(
+            135deg,
+            #4f91ff,
+            #236cff
+        );
 
-            border-radius: 10px;
+    box-shadow:
+        0 10px 30px rgba(35, 108, 255, 0.22);
 
-            background: var(--panel2);
-            color: var(--text);
+    font-weight: 700;
 
-            text-align: left;
-        }
+    transition: 0.2s;
+}
 
-        /* MAIN */
+.new-project:hover {
+    transform: translateY(-1px);
+}
 
-        .main {
-            width: calc(100% - 260px);
-            min-height: 100vh;
+.nav {
+    margin-top: 25px;
 
-            margin-left: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
 
-            display: flex;
-            flex-direction: column;
-        }
+.nav button {
+    width: 100%;
 
-        .topbar {
-            height: 65px;
-            min-height: 65px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    border: 0;
+    border-radius: 12px;
 
-            padding: 0 25px;
+    padding: 12px 13px;
 
-            border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    background: transparent;
 
-            background: rgba(2, 7, 17, 0.35);
-            backdrop-filter: blur(15px);
-        }
+    text-align: left;
 
-        body.light .topbar {
-            background: rgba(255, 255, 255, 0.55);
-        }
+    transition: 0.2s;
+}
 
-        .top-title {
-            font-weight: 800;
-            font-size: 15px;
-        }
+.nav button:hover,
+.nav button.active {
+    color: var(--text);
+    background: var(--blue-soft);
+}
 
-        .status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+.nav-icon {
+    width: 24px;
+    text-align: center;
+}
 
-            color: var(--muted);
-            font-size: 13px;
-        }
+.sidebar-bottom {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 18px;
+}
 
-        .dot {
-            width: 8px;
-            height: 8px;
+.theme-button {
+    width: 100%;
 
-            border-radius: 50%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-            background: #19d477;
+    border: 1px solid var(--border);
+    border-radius: 12px;
 
-            box-shadow:
-                0 0 12px #19d477;
-        }
+    padding: 11px 13px;
 
-        /* CHAT */
+    background: var(--panel);
+    color: var(--muted);
+}
 
-        .chat {
-            flex: 1;
+/* MAIN */
 
-            overflow-y: auto;
+.main {
+    margin-left: 270px;
+    min-height: 100vh;
+}
 
-            padding:
-                30px
-                20px
-                170px;
-        }
+.topbar {
+    height: 72px;
 
-        .welcome {
-            max-width: 850px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-            margin:
-                80px
-                auto
-                0;
+    padding: 0 34px;
 
-            text-align: center;
-        }
+    border-bottom: 1px solid var(--border);
 
-        .welcome-logo {
-            font-size: clamp(42px, 8vw, 70px);
+    background: rgba(5, 7, 13, 0.45);
 
-            font-weight: 900;
+    backdrop-filter: blur(20px);
 
-            letter-spacing: 5px;
-        }
+    position: sticky;
+    top: 0;
 
-        .welcome-logo span {
-            color: var(--blue2);
-        }
+    z-index: 30;
+}
 
-        .welcome p {
-            margin-top: 12px;
+[data-theme="light"] .topbar {
+    background: rgba(245, 248, 252, 0.65);
+}
 
-            color: var(--muted);
+.page-title {
+    font-weight: 700;
+}
 
-            font-size: 16px;
-        }
+.user-button {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
 
-        .suggestions {
-            display: grid;
+    border-radius: 12px;
 
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
+    padding: 8px 13px;
+}
 
-            gap: 10px;
+/* CONTENT */
 
-            max-width: 700px;
+.content {
+    width: min(1180px, calc(100% - 48px));
 
-            margin:
-                35px
-                auto
-                0;
-        }
+    margin: 0 auto;
 
-        .suggestion {
-            padding: 15px;
+    padding: 58px 0 100px;
+}
 
-            border-radius: 13px;
+/* HERO */
 
-            border: 1px solid var(--border);
+.hero {
+    max-width: 900px;
+    margin: 35px auto 55px;
 
-            background: var(--panel);
+    text-align: center;
+}
 
-            color: var(--text);
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 
-            text-align: left;
-        }
+    padding: 7px 12px;
 
-        .suggestion:hover {
-            border-color: var(--blue);
-            transform: translateY(-1px);
-        }
+    border: 1px solid var(--border);
+    border-radius: 999px;
 
-        .message {
-            max-width: 850px;
+    background: var(--blue-soft);
 
-            margin:
-                0
-                auto
-                18px;
+    color: var(--blue-light);
 
-            padding:
-                16px
-                19px;
+    font-size: 13px;
+    font-weight: 700;
+}
 
-            border-radius: 16px;
+.hero h1 {
+    margin: 20px 0 18px;
 
-            line-height: 1.6;
+    font-size: clamp(42px, 7vw, 76px);
 
-            white-space: pre-wrap;
+    line-height: 0.98;
 
-            word-break: break-word;
-        }
+    letter-spacing: -4px;
 
-        .user {
-            width: fit-content;
-            max-width: 80%;
+    font-weight: 850;
+}
 
-            margin-left: auto;
+.hero h1 span {
+    color: var(--blue-light);
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #087cff,
-                    #00a8ed
-                );
+    text-shadow:
+        0 0 40px rgba(77, 141, 255, 0.3);
+}
 
-            color: white;
-        }
+.hero p {
+    max-width: 670px;
+    margin: auto;
 
-        .assistant {
-            background: var(--panel);
+    color: var(--muted);
 
-            border:
-                1px solid
-                var(--border);
+    font-size: 18px;
+    line-height: 1.65;
+}
 
-            margin-right: auto;
-        }
+.hero-actions {
+    margin-top: 30px;
 
-        .typing {
-            opacity: 0.7;
-        }
+    display: flex;
+    justify-content: center;
+    gap: 12px;
 
-        /* COMPOSER */
+    flex-wrap: wrap;
+}
 
-        .composer {
-            position: fixed;
+.primary-button,
+.secondary-button {
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-weight: 750;
+}
 
-            left: 260px;
-            right: 0;
-            bottom: 0;
+.primary-button {
+    border: 0;
 
-            z-index: 15;
+    color: white;
 
-            padding:
-                20px
-                20px
-                22px;
+    background:
+        linear-gradient(
+            135deg,
+            #5c9bff,
+            #236cff
+        );
 
-            background:
-                linear-gradient(
-                    transparent,
-                    var(--bg) 30%
-                );
-        }
+    box-shadow:
+        0 15px 40px rgba(35, 108, 255, 0.22);
+}
 
-        .composer-inner {
-            max-width: 850px;
+.secondary-button {
+    border: 1px solid var(--border);
 
-            margin: auto;
+    background: var(--panel);
 
-            display: flex;
-            align-items: flex-end;
+    color: var(--text);
+}
 
-            gap: 10px;
+/* MODE CARDS */
 
-            padding: 9px;
+.mode-grid {
+    display: grid;
 
-            background: var(--panel);
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
 
-            border:
-                1px solid
-                var(--border);
+    gap: 18px;
 
-            border-radius: 17px;
+    max-width: 900px;
+    margin: 0 auto;
+}
 
-            box-shadow:
-                0 15px 45px
-                rgba(0, 0, 0, 0.25);
-        }
+.mode-card {
+    position: relative;
 
-        textarea {
-            flex: 1;
+    padding: 26px;
 
-            min-height: 48px;
-            max-height: 180px;
+    min-height: 220px;
 
-            resize: none;
+    border: 1px solid var(--border);
+    border-radius: 22px;
 
-            outline: none;
-            border: 0;
+    background: var(--panel);
 
-            background: transparent;
+    backdrop-filter: blur(20px);
 
-            color: var(--text);
+    box-shadow: var(--shadow);
 
-            padding:
-                12px;
+    transition:
+        transform 0.25s,
+        border-color 0.25s;
+}
 
-            line-height: 1.4;
-        }
+.mode-card:hover {
+    transform: translateY(-4px);
 
-        textarea::placeholder {
-            color: var(--muted);
-        }
+    border-color:
+        rgba(77, 141, 255, 0.35);
+}
 
-        .send {
-            width: 48px;
-            height: 48px;
+.mode-icon {
+    width: 48px;
+    height: 48px;
 
-            flex-shrink: 0;
+    display: grid;
+    place-items: center;
 
-            border-radius: 12px;
+    border-radius: 14px;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--blue),
-                    var(--blue2)
-                );
+    background: var(--blue-soft);
 
-            color: white;
+    font-size: 22px;
+}
 
-            font-size: 19px;
-        }
+.mode-card h3 {
+    margin: 20px 0 9px;
+    font-size: 21px;
+}
 
-        .send:disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-        }
+.mode-card p {
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+}
 
-        /* MOBILE */
+/* APP SECTIONS */
 
-        .mobile-header {
-            display: none;
-        }
+.section {
+    display: none;
+}
 
-        @media (max-width: 700px) {
+.section.active {
+    display: block;
+}
 
-            .sidebar {
-                display: none;
-            }
+/* CHAT */
 
-            .main {
-                width: 100%;
-                margin-left: 0;
-            }
+.chat-shell {
+    max-width: 900px;
+    margin: 0 auto;
+}
 
-            .mobile-header {
-                display: flex;
+.chat-messages {
+    min-height: 420px;
 
-                height: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 
-                align-items: center;
-                justify-content: space-between;
+    padding: 15px 0 25px;
+}
 
-                padding:
-                    0
-                    15px;
+.message {
+    max-width: 82%;
 
-                border-bottom:
-                    1px solid
-                    var(--border);
-            }
+    padding: 14px 16px;
 
-            .mobile-logo {
-                font-weight: 900;
-                letter-spacing: 2px;
-            }
+    border-radius: 17px;
 
-            .mobile-logo span {
-                color: var(--blue2);
-            }
+    line-height: 1.6;
 
-            .topbar {
-                height: 52px;
-                min-height: 52px;
+    white-space: pre-wrap;
+}
 
-                padding:
-                    0
-                    15px;
-            }
+.message.ai {
+    align-self: flex-start;
 
-            .chat {
-                padding:
-                    20px
-                    12px
-                    160px;
-            }
+    background: var(--panel);
 
-            .welcome {
-                margin-top: 50px;
-            }
+    border: 1px solid var(--border);
+}
 
-            .welcome-logo {
-                font-size: 43px;
-            }
+.message.user {
+    align-self: flex-end;
 
-            .welcome p {
-                font-size: 14px;
-            }
+    background: var(--blue);
 
-            .suggestions {
-                grid-template-columns: 1fr;
+    color: white;
+}
 
-                margin-top: 25px;
-            }
+.chat-input {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
 
-            .message {
-                max-width: 94%;
-            }
+    padding: 10px;
 
-            .user {
-                max-width: 90%;
-            }
+    border: 1px solid var(--border);
+    border-radius: 20px;
 
-            .composer {
-                left: 0;
+    background: var(--panel);
 
-                padding:
-                    10px
-                    10px
-                    14px;
-            }
+    box-shadow: var(--shadow);
 
-            .composer-inner {
-                border-radius: 15px;
-            }
+    backdrop-filter: blur(20px);
+}
 
-            textarea {
-                font-size: 14px;
-            }
-        }
-    </style>
+.chat-input textarea {
+    flex: 1;
+
+    min-height: 48px;
+    max-height: 180px;
+
+    resize: none;
+
+    border: 0;
+    outline: 0;
+
+    padding: 13px;
+
+    background: transparent;
+
+    color: var(--text);
+}
+
+.send-button {
+    width: 48px;
+    height: 48px;
+
+    border: 0;
+    border-radius: 14px;
+
+    color: white;
+
+    background: var(--blue);
+
+    font-size: 18px;
+}
+
+/* PROJECT */
+
+.project-panel {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.project-box {
+    padding: 30px;
+
+    border: 1px solid var(--border);
+    border-radius: 24px;
+
+    background: var(--panel);
+
+    box-shadow: var(--shadow);
+}
+
+.project-box h2 {
+    margin-top: 0;
+}
+
+.project-box p {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.project-textarea {
+    width: 100%;
+
+    min-height: 170px;
+
+    margin-top: 20px;
+
+    padding: 17px;
+
+    resize: vertical;
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    outline: none;
+
+    background: var(--bg-soft);
+    color: var(--text);
+}
+
+.project-submit {
+    margin-top: 14px;
+
+    border: 0;
+    border-radius: 14px;
+
+    padding: 13px 20px;
+
+    color: white;
+    background: var(--blue);
+
+    font-weight: 750;
+}
+
+/* EMPTY PAGES */
+
+.empty-card {
+    max-width: 800px;
+
+    margin: 40px auto;
+
+    padding: 60px 25px;
+
+    text-align: center;
+
+    border: 1px solid var(--border);
+    border-radius: 24px;
+
+    background: var(--panel);
+}
+
+.empty-card .big {
+    font-size: 45px;
+}
+
+.empty-card p {
+    color: var(--muted);
+}
+
+/* MOBILE */
+
+.mobile-header {
+    display: none;
+}
+
+.mobile-nav {
+    display: none;
+}
+
+@media (max-width: 800px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    .topbar {
+        display: none;
+    }
+
+    .mobile-header {
+        position: sticky;
+        top: 0;
+
+        height: 64px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 16px;
+
+        border-bottom: 1px solid var(--border);
+
+        background: rgba(5, 7, 13, 0.72);
+
+        backdrop-filter: blur(20px);
+
+        z-index: 40;
+    }
+
+    [data-theme="light"] .mobile-header {
+        background: rgba(245, 248, 252, 0.8);
+    }
+
+    .content {
+        width: calc(100% - 28px);
+        padding: 25px 0 100px;
+    }
+
+    .hero {
+        margin: 30px auto 38px;
+    }
+
+    .hero h1 {
+        font-size: 46px;
+        letter-spacing: -2.5px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .mode-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mode-card {
+        min-height: auto;
+    }
+
+    .mobile-nav {
+        position: fixed;
+
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+
+        height: 66px;
+
+        display: grid;
+        grid-template-columns:
+            repeat(5, 1fr);
+
+        border: 1px solid var(--border);
+        border-radius: 20px;
+
+        background: rgba(10, 15, 25, 0.88);
+
+        backdrop-filter: blur(24px);
+
+        z-index: 100;
+
+        box-shadow: var(--shadow);
+    }
+
+    [data-theme="light"] .mobile-nav {
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .mobile-nav button {
+        border: 0;
+
+        background: transparent;
+
+        color: var(--muted);
+
+        font-size: 11px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .mobile-nav button.active {
+        color: var(--blue-light);
+    }
+
+    .mobile-nav span:first-child {
+        font-size: 20px;
+    }
+
+    .message {
+        max-width: 90%;
+    }
+
+    .chat-input {
+        border-radius: 17px;
+    }
+}
+</style>
 </head>
 
 <body>
@@ -582,545 +804,797 @@
     <aside class="sidebar">
 
         <div class="logo">
-            MY<span>AI</span>
+            <div class="logo-mark">T</div>
+
+            <div class="logo-text">
+                TEYZ<span>.AI</span>
+            </div>
         </div>
 
         <button
-            class="new-chat"
-            id="newChat"
+            class="new-project"
+            onclick="openSection('project')"
         >
-            ＋ Новый чат
+            ＋ Создать проект
         </button>
 
-        <div class="mode-title">
-            Режим
+        <nav class="nav">
+
+            <button
+                data-section="home"
+                class="active"
+                onclick="openSection('home')"
+            >
+                <span class="nav-icon">⌂</span>
+                Главная
+            </button>
+
+            <button
+                data-section="project"
+                onclick="openSection('project')"
+            >
+                <span class="nav-icon">💻</span>
+                Создать проект
+            </button>
+
+            <button
+                data-section="projects"
+                onclick="openSection('projects')"
+            >
+                <span class="nav-icon">📁</span>
+                Мои проекты
+            </button>
+
+            <button
+                data-section="chat"
+                onclick="openSection('chat')"
+            >
+                <span class="nav-icon">💬</span>
+                Чаты
+            </button>
+
+            <button
+                data-section="plans"
+                onclick="openSection('plans')"
+            >
+                <span class="nav-icon">💎</span>
+                Тарифы
+            </button>
+
+            <button
+                data-section="support"
+                onclick="openSection('support')"
+            >
+                <span class="nav-icon">🆘</span>
+                Поддержка
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <button
+                class="theme-button"
+                onclick="toggleTheme()"
+            >
+                <span>Тема</span>
+                <span id="themeIcon">🌙</span>
+            </button>
+
         </div>
-
-        <button
-            class="mode active"
-            data-mode="chat"
-        >
-            💬 Чат
-        </button>
-
-        <button
-            class="mode"
-            data-mode="code"
-        >
-            💻 Создать приложение
-        </button>
-
-        <button
-            class="theme"
-            id="themeButton"
-        >
-            🌙 Тёмная тема
-        </button>
 
     </aside>
 
 
     <main class="main">
 
-        <div class="mobile-header">
+        <header class="topbar">
 
-            <div class="mobile-logo">
-                MY<span>AI</span>
+            <div
+                class="page-title"
+                id="pageTitle"
+            >
+                TEYZ.AI
             </div>
 
             <button
-                id="mobileTheme"
-                title="Сменить тему"
+                class="user-button"
+                onclick="openSection('profile')"
             >
-                🌙
+                👤 Профиль
             </button>
 
-        </div>
+        </header>
 
 
-        <div class="topbar">
+        <header class="mobile-header">
 
-            <div class="top-title">
-                MY AI
+            <div class="logo">
+                <div class="logo-mark">T</div>
+
+                <div class="logo-text">
+                    TEYZ<span>.AI</span>
+                </div>
             </div>
 
-            <div class="status">
+            <button
+                class="user-button"
+                onclick="openSection('profile')"
+            >
+                👤
+            </button>
 
-                <span class="dot"></span>
-
-                <span>
-                    AI онлайн
-                </span>
-
-            </div>
-
-        </div>
+        </header>
 
 
-        <section
-            class="chat"
-            id="chat"
-        >
+        <div class="content">
 
-            <div
-                class="welcome"
-                id="welcome"
+            <!-- HOME -->
+
+            <section
+                id="section-home"
+                class="section active"
             >
 
-                <div class="welcome-logo">
-                    MY<span>AI</span>
-                </div>
+                <div class="hero">
 
-                <p id="welcomeText">
-                    Твой персональный AI-помощник
-                </p>
+                    <div class="badge">
+                        ✦ AI PLATFORM
+                    </div>
 
-                <div class="suggestions">
+                    <h1>
+                        Создавай больше
+                        <span>с AI.</span>
+                    </h1>
 
-                    <button
-                        class="suggestion"
-                        data-prompt="Создай простой современный сайт"
-                    >
-                        🌐 Создать сайт
-                    </button>
+                    <p>
+                        TEYZ.AI объединяет интеллектуальный чат
+                        и AI-создание программных проектов
+                        в одной современной платформе.
+                    </p>
 
-                    <button
-                        class="suggestion"
-                        data-prompt="Напиши Telegram-бота на Python"
-                    >
-                        🤖 Создать Telegram-бота
-                    </button>
+                    <div class="hero-actions">
 
-                    <button
-                        class="suggestion"
-                        data-prompt="Объясни мне Python простыми словами"
-                    >
-                        🧠 Объяснить код
-                    </button>
+                        <button
+                            class="primary-button"
+                            onclick="openSection('project')"
+                        >
+                            💻 Создать проект
+                        </button>
 
-                    <button
-                        class="suggestion"
-                        data-prompt="Придумай идею приложения"
-                    >
-                        🚀 Придумать приложение
-                    </button>
+                        <button
+                            class="secondary-button"
+                            onclick="openSection('chat')"
+                        >
+                            💬 Открыть AI-чат
+                        </button>
+
+                    </div>
 
                 </div>
 
-            </div>
 
-        </section>
+                <div class="mode-grid">
+
+                    <div
+                        class="mode-card"
+                        onclick="openSection('chat')"
+                    >
+
+                        <div class="mode-icon">
+                            💬
+                        </div>
+
+                        <h3>
+                            AI Chat
+                        </h3>
+
+                        <p>
+                            Общайся с AI, задавай вопросы,
+                            анализируй информацию, изображения
+                            и документы.
+                        </p>
+
+                    </div>
 
 
-        <div class="composer">
+                    <div
+                        class="mode-card"
+                        onclick="openSection('project')"
+                    >
 
-            <div class="composer-inner">
+                        <div class="mode-icon">
+                            💻
+                        </div>
 
-                <textarea
-                    id="messageInput"
-                    placeholder="Напиши сообщение..."
-                    rows="1"
-                ></textarea>
+                        <h3>
+                            Project Builder
+                        </h3>
 
-                <button
-                    class="send"
-                    id="sendButton"
-                    title="Отправить"
-                >
-                    ➤
-                </button>
+                        <p>
+                            Создавай сайты, Telegram-ботов,
+                            приложения, API и другие проекты
+                            с помощью AI.
+                        </p>
 
-            </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CHAT -->
+
+            <section
+                id="section-chat"
+                class="section"
+            >
+
+                <div class="chat-shell">
+
+                    <div class="hero">
+
+                        <div class="badge">
+                            💬 AI CHAT
+                        </div>
+
+                        <h1>
+                            Твой AI-чат
+                        </h1>
+
+                        <p>
+                            Задавай вопросы и работай с AI
+                            в обычном режиме.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="chatMessages"
+                        class="chat-messages"
+                    >
+
+                        <div class="message ai">
+                            Привет! Я TEYZ.AI.
+                            Чем могу помочь?
+                        </div>
+
+                    </div>
+
+
+                    <div class="chat-input">
+
+                        <textarea
+                            id="chatInput"
+                            placeholder="Напиши сообщение..."
+                            onkeydown="handleChatKey(event)"
+                        ></textarea>
+
+                        <button
+                            class="send-button"
+                            onclick="sendChat()"
+                        >
+                            ↑
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- PROJECT -->
+
+            <section
+                id="section-project"
+                class="section"
+            >
+
+                <div class="project-panel">
+
+                    <div class="hero">
+
+                        <div class="badge">
+                            💻 PROJECT AGENT
+                        </div>
+
+                        <h1>
+                            Создай
+                            <span>проект.</span>
+                        </h1>
+
+                        <p>
+                            Опиши идею. TEYZ.AI определит,
+                            что потребуется для её создания,
+                            и подготовит проект.
+                        </p>
+
+                    </div>
+
+
+                    <div class="project-box">
+
+                        <h2>
+                            Что создаём?
+                        </h2>
+
+                        <p>
+                            Например: «Создай Telegram-бота
+                            магазина с каталогом и оплатой».
+                        </p>
+
+                        <textarea
+                            id="projectInput"
+                            class="project-textarea"
+                            placeholder="Опиши свой проект..."
+                        ></textarea>
+
+                        <button
+                            class="project-submit"
+                            onclick="createProject()"
+                        >
+                            Начать создание →
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- PROJECTS -->
+
+            <section
+                id="section-projects"
+                class="section"
+            >
+
+                <div class="empty-card">
+
+                    <div class="big">
+                        📁
+                    </div>
+
+                    <h2>
+                        Мои проекты
+                    </h2>
+
+                    <p>
+                        Здесь будут храниться созданные
+                        тобой проекты.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- PLANS -->
+
+            <section
+                id="section-plans"
+                class="section"
+            >
+
+                <div class="empty-card">
+
+                    <div class="big">
+                        💎
+                    </div>
+
+                    <h2>
+                        Тарифы
+                    </h2>
+
+                    <p>
+                        Система тарифов будет подключена
+                        после создания аккаунтов и billing.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- SUPPORT -->
+
+            <section
+                id="section-support"
+                class="section"
+            >
+
+                <div class="empty-card">
+
+                    <div class="big">
+                        🆘
+                    </div>
+
+                    <h2>
+                        Поддержка
+                    </h2>
+
+                    <p>
+                        Здесь будет система обращений
+                        в поддержку TEYZ.AI.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- PROFILE -->
+
+            <section
+                id="section-profile"
+                class="section"
+            >
+
+                <div class="empty-card">
+
+                    <div class="big">
+                        👤
+                    </div>
+
+                    <h2>
+                        Профиль
+                    </h2>
+
+                    <p>
+                        Авторизация и аккаунт будут
+                        подключены следующим этапом.
+                    </p>
+
+                </div>
+
+            </section>
 
         </div>
 
     </main>
 
+
+    <nav class="mobile-nav">
+
+        <button
+            data-section="home"
+            class="active"
+            onclick="openSection('home')"
+        >
+            <span>⌂</span>
+            Главная
+        </button>
+
+        <button
+            data-section="project"
+            onclick="openSection('project')"
+        >
+            <span>💻</span>
+            Проект
+        </button>
+
+        <button
+            data-section="chat"
+            onclick="openSection('chat')"
+        >
+            <span>💬</span>
+            Чат
+        </button>
+
+        <button
+            data-section="projects"
+            onclick="openSection('projects')"
+        >
+            <span>📁</span>
+            Проекты
+        </button>
+
+        <button
+            data-section="profile"
+            onclick="openSection('profile')"
+        >
+            <span>👤</span>
+            Профиль
+        </button>
+
+    </nav>
+
 </div>
 
 
 <script>
+const titles = {
+    home: "TEYZ.AI",
+    project: "Создание проекта",
+    projects: "Мои проекты",
+    chat: "AI Chat",
+    plans: "Тарифы",
+    support: "Поддержка",
+    profile: "Профиль"
+};
 
-    const chat =
-        document.getElementById("chat");
 
-    const welcome =
-        document.getElementById("welcome");
+function openSection(name) {
+
+    document
+        .querySelectorAll(".section")
+        .forEach(section => {
+            section.classList.remove("active");
+        });
+
+    const target =
+        document.getElementById(
+            "section-" + name
+        );
+
+    if (target) {
+        target.classList.add("active");
+    }
+
+    document
+        .querySelectorAll(
+            "[data-section]"
+        )
+        .forEach(button => {
+            button.classList.toggle(
+                "active",
+                button.dataset.section === name
+            );
+        });
+
+    document.getElementById(
+        "pageTitle"
+    ).textContent =
+        titles[name] || "TEYZ.AI";
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+function toggleTheme() {
+
+    const current =
+        document.documentElement
+            .getAttribute("data-theme");
+
+    const next =
+        current === "light"
+            ? "dark"
+            : "light";
+
+    document.documentElement
+        .setAttribute(
+            "data-theme",
+            next
+        );
+
+    localStorage.setItem(
+        "teyz-theme",
+        next
+    );
+
+    document.getElementById(
+        "themeIcon"
+    ).textContent =
+        next === "light"
+            ? "☀️"
+            : "🌙";
+}
+
+
+function loadTheme() {
+
+    const theme =
+        localStorage.getItem(
+            "teyz-theme"
+        ) || "dark";
+
+    document.documentElement
+        .setAttribute(
+            "data-theme",
+            theme
+        );
+
+    document.getElementById(
+        "themeIcon"
+    ).textContent =
+        theme === "light"
+            ? "☀️"
+            : "🌙";
+}
+
+
+function addMessage(
+    text,
+    type
+) {
+
+    const container =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    const message =
+        document.createElement(
+            "div"
+        );
+
+    message.className =
+        "message " + type;
+
+    message.textContent = text;
+
+    container.appendChild(
+        message
+    );
+
+    container.scrollTop =
+        container.scrollHeight;
+}
+
+
+async function sendChat() {
 
     const input =
-        document.getElementById("messageInput");
-
-    const sendButton =
-        document.getElementById("sendButton");
-
-    const newChat =
-        document.getElementById("newChat");
-
-    const themeButton =
-        document.getElementById("themeButton");
-
-    const mobileTheme =
-        document.getElementById("mobileTheme");
-
-    const welcomeText =
-        document.getElementById("welcomeText");
-
-
-    let currentMode = "chat";
-
-
-    function addMessage(
-        text,
-        type
-    ) {
-
-        const message =
-            document.createElement("div");
-
-        message.className =
-            "message " + type;
-
-        message.textContent = text;
-
-        chat.appendChild(message);
-
-        chat.scrollTop =
-            chat.scrollHeight;
-
-        return message;
-    }
-
-
-    function showWelcome() {
-
-        if (!welcome) {
-            return;
-        }
-
-        welcome.style.display =
-            "block";
-    }
-
-
-    function hideWelcome() {
-
-        if (!welcome) {
-            return;
-        }
-
-        welcome.style.display =
-            "none";
-    }
-
-
-    async function sendMessage(
-        customMessage = null
-    ) {
-
-        const message =
-            customMessage !== null
-                ? customMessage.trim()
-                : input.value.trim();
-
-        if (!message) {
-            return;
-        }
-
-        hideWelcome();
-
-        addMessage(
-            message,
-            "user"
+        document.getElementById(
+            "chatInput"
         );
 
-        input.value = "";
+    const message =
+        input.value.trim();
 
-        input.style.height =
-            "48px";
-
-        sendButton.disabled =
-            true;
-
-        const typing =
-            addMessage(
-                "MY AI печатает...",
-                "assistant typing"
-            );
-
-        try {
-
-            const response =
-                await fetch(
-                    "/api/chat",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            message:
-                                currentMode === "code"
-                                    ? "Режим создания приложения. Пользователь просит: " + message
-                                    : message
-                        })
-                    }
-                );
-
-            const data =
-                await response.json();
-
-            typing.remove();
-
-            if (!response.ok) {
-
-                addMessage(
-                    "Ошибка: " +
-                    (
-                        data.error ||
-                        "Неизвестная ошибка"
-                    ),
-                    "assistant"
-                );
-
-                return;
-            }
-
-            addMessage(
-                data.answer ||
-                "AI не вернул ответ.",
-                "assistant"
-            );
-
-        } catch (error) {
-
-            typing.remove();
-
-            addMessage(
-                "Не удалось подключиться к серверу MY AI.",
-                "assistant"
-            );
-
-        } finally {
-
-            sendButton.disabled =
-                false;
-
-            input.focus();
-        }
+    if (!message) {
+        return;
     }
 
-
-    sendButton.addEventListener(
-        "click",
-        () => sendMessage()
+    addMessage(
+        message,
+        "user"
     );
 
+    input.value = "";
 
-    input.addEventListener(
-        "keydown",
-        (event) => {
-
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
-
-                event.preventDefault();
-
-                sendMessage();
-            }
-
-        }
+    addMessage(
+        "TEYZ.AI думает...",
+        "ai"
     );
 
-
-    input.addEventListener(
-        "input",
-        () => {
-
-            input.style.height =
-                "48px";
-
-            input.style.height =
-                Math.min(
-                    input.scrollHeight,
-                    180
-                ) + "px";
-        }
-    );
-
-
-    document
-        .querySelectorAll(".mode")
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        document
-                            .querySelectorAll(".mode")
-                            .forEach(
-                                item =>
-                                    item.classList.remove(
-                                        "active"
-                                    )
-                            );
-
-                        button.classList.add(
-                            "active"
-                        );
-
-                        currentMode =
-                            button.dataset.mode;
-
-                        if (
-                            currentMode ===
-                            "code"
-                        ) {
-
-                            input.placeholder =
-                                "Опиши приложение, которое нужно создать...";
-
-                            welcomeText.textContent =
-                                "Опиши идею — MY AI поможет спроектировать приложение";
-
-                        } else {
-
-                            input.placeholder =
-                                "Напиши сообщение...";
-
-                            welcomeText.textContent =
-                                "Твой персональный AI-помощник";
-                        }
-                    }
-                );
-
-            }
+    const messages =
+        document.getElementById(
+            "chatMessages"
         );
 
+    const thinking =
+        messages.lastElementChild;
 
-    document
-        .querySelectorAll(".suggestion")
-        .forEach(
-            button => {
+    try {
 
-                button.addEventListener(
-                    "click",
-                    () => {
+        const response =
+            await fetch(
+                "/api/chat",
+                {
+                    method: "POST",
 
-                        input.value =
-                            button.dataset.prompt;
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                        input.focus();
-
-                        sendMessage();
-                    }
-                );
-
-            }
-        );
-
-
-    function toggleTheme() {
-
-        document.body.classList.toggle(
-            "light"
-        );
-
-        const light =
-            document.body.classList.contains(
-                "light"
+                    body: JSON.stringify({
+                        message: message,
+                        mode: "chat"
+                    })
+                }
             );
 
-        localStorage.setItem(
-            "myai-theme",
-            light
-                ? "light"
-                : "dark"
-        );
+        const data =
+            await response.json();
 
-        updateThemeButtons();
+        thinking.textContent =
+            data.answer ||
+            data.error ||
+            "Не удалось получить ответ.";
+
+    } catch (error) {
+
+        thinking.textContent =
+            "Не удалось подключиться к TEYZ.AI.";
     }
+}
 
 
-    function updateThemeButtons() {
-
-        const light =
-            document.body.classList.contains(
-                "light"
-            );
-
-        if (themeButton) {
-
-            themeButton.textContent =
-                light
-                    ? "☀️ Светлая тема"
-                    : "🌙 Тёмная тема";
-        }
-
-        if (mobileTheme) {
-
-            mobileTheme.textContent =
-                light
-                    ? "☀️"
-                    : "🌙";
-        }
-    }
-
-
-    themeButton.addEventListener(
-        "click",
-        toggleTheme
-    );
-
-
-    mobileTheme.addEventListener(
-        "click",
-        toggleTheme
-    );
-
-
-    newChat.addEventListener(
-        "click",
-        () => {
-
-            chat.innerHTML = "";
-
-            chat.appendChild(
-                welcome
-            );
-
-            welcome.style.display =
-                "block";
-
-            input.value = "";
-
-            input.focus();
-        }
-    );
-
-
-    const savedTheme =
-        localStorage.getItem(
-            "myai-theme"
-        );
+function handleChatKey(event) {
 
     if (
-        savedTheme === "light"
+        event.key === "Enter" &&
+        !event.shiftKey
     ) {
 
-        document.body.classList.add(
-            "light"
+        event.preventDefault();
+
+        sendChat();
+    }
+}
+
+
+async function createProject() {
+
+    const input =
+        document.getElementById(
+            "projectInput"
         );
+
+    const message =
+        input.value.trim();
+
+    if (!message) {
+        return;
     }
 
-    updateThemeButtons();
+    openSection("chat");
 
+    addMessage(
+        "💻 " + message,
+        "user"
+    );
+
+    addMessage(
+        "Анализирую проект и определяю необходимые данные...",
+        "ai"
+    );
+
+    const messages =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    const thinking =
+        messages.lastElementChild;
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/chat",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        message: message,
+                        mode: "project"
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        thinking.textContent =
+            data.answer ||
+            data.error ||
+            "Не удалось получить ответ.";
+
+    } catch (error) {
+
+        thinking.textContent =
+            "Не удалось подключиться к TEYZ.AI.";
+    }
+}
+
+
+loadTheme();
 </script>
 
 </body>
