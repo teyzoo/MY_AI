@@ -12,15 +12,15 @@
         }
 
         :root {
-            --bg: #030712;
+            --bg: #020711;
             --panel: #07111f;
-            --panel2: #0a1728;
-            --border: #16304d;
-            --text: #f4f8ff;
+            --panel2: #0b192b;
+            --border: #183553;
+            --text: #f5f9ff;
             --muted: #7f96b2;
             --blue: #168cff;
-            --blue2: #00b7ff;
-            --input: #050d18;
+            --blue2: #00c2ff;
+            --danger: #ff4d67;
         }
 
         body.light {
@@ -32,18 +32,40 @@
             --muted: #60748b;
             --blue: #087cff;
             --blue2: #009de0;
-            --input: #f8fbff;
+        }
+
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            min-height: 100%;
         }
 
         body {
-            margin: 0;
             min-height: 100vh;
             background:
-                radial-gradient(circle at 50% -10%, rgba(0, 140, 255, 0.16), transparent 35%),
+                radial-gradient(
+                    circle at 50% -10%,
+                    rgba(0, 150, 255, 0.20),
+                    transparent 38%
+                ),
                 var(--bg);
             color: var(--text);
-            font-family: Arial, sans-serif;
-            transition: 0.25s;
+            font-family:
+                Inter,
+                Arial,
+                sans-serif;
+            transition: background 0.25s, color 0.25s;
+        }
+
+        button,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
         }
 
         .app {
@@ -51,23 +73,36 @@
             display: flex;
         }
 
+        /* SIDEBAR */
+
         .sidebar {
             width: 260px;
-            border-right: 1px solid var(--border);
-            background: rgba(3, 10, 20, 0.85);
-            padding: 18px;
+            min-width: 260px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 20;
+
             display: flex;
             flex-direction: column;
+
+            padding: 18px;
+
+            background: rgba(3, 10, 20, 0.94);
+            border-right: 1px solid var(--border);
+
+            backdrop-filter: blur(18px);
         }
 
         body.light .sidebar {
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.94);
         }
 
         .logo {
             font-size: 25px;
-            font-weight: 800;
-            letter-spacing: 2px;
+            font-weight: 900;
+            letter-spacing: 3px;
             margin-bottom: 25px;
         }
 
@@ -75,73 +110,122 @@
             color: var(--blue2);
         }
 
-        button {
-            border: 0;
-            cursor: pointer;
-            color: var(--text);
-        }
-
         .new-chat {
             width: 100%;
-            padding: 13px;
+            padding: 13px 15px;
+
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--blue), var(--blue2));
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--blue2)
+                );
+
             color: white;
-            font-weight: 700;
-            margin-bottom: 18px;
+            font-weight: 800;
+
+            box-shadow:
+                0 8px 25px rgba(0, 150, 255, 0.20);
+        }
+
+        .new-chat:hover {
+            filter: brightness(1.1);
         }
 
         .mode-title {
+            margin: 25px 5px 10px;
+
             color: var(--muted);
-            font-size: 12px;
-            margin: 10px 5px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
         .mode {
             width: 100%;
             padding: 12px;
-            margin-bottom: 8px;
-            text-align: left;
+
+            margin-bottom: 7px;
+
             border-radius: 10px;
+
             background: transparent;
             color: var(--muted);
+
+            text-align: left;
         }
 
-        .mode.active,
-        .mode:hover {
+        .mode:hover,
+        .mode.active {
             background: var(--panel2);
             color: var(--text);
+        }
+
+        .mode.active {
+            box-shadow:
+                inset 2px 0 0 var(--blue2);
         }
 
         .theme {
+            width: 100%;
+
             margin-top: auto;
+
             padding: 12px;
+
             border-radius: 10px;
+
             background: var(--panel2);
             color: var(--text);
+
+            text-align: left;
         }
 
+        /* MAIN */
+
         .main {
-            flex: 1;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+
+            margin-left: 260px;
+
             display: flex;
             flex-direction: column;
-            min-width: 0;
         }
 
         .topbar {
             height: 65px;
+            min-height: 65px;
+
             display: flex;
             align-items: center;
             justify-content: space-between;
+
             padding: 0 25px;
+
             border-bottom: 1px solid var(--border);
+
+            background: rgba(2, 7, 17, 0.35);
+            backdrop-filter: blur(15px);
+        }
+
+        body.light .topbar {
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .top-title {
+            font-weight: 800;
+            font-size: 15px;
         }
 
         .status {
             display: flex;
             align-items: center;
             gap: 8px;
+
             color: var(--muted);
             font-size: 13px;
         }
@@ -149,28 +233,45 @@
         .dot {
             width: 8px;
             height: 8px;
+
             border-radius: 50%;
+
             background: #19d477;
-            box-shadow: 0 0 12px #19d477;
+
+            box-shadow:
+                0 0 12px #19d477;
         }
+
+        /* CHAT */
 
         .chat {
             flex: 1;
+
             overflow-y: auto;
-            padding: 35px 20px 160px;
+
+            padding:
+                30px
+                20px
+                170px;
         }
 
         .welcome {
-            max-width: 800px;
-            margin: 80px auto 0;
+            max-width: 850px;
+
+            margin:
+                80px
+                auto
+                0;
+
             text-align: center;
         }
 
         .welcome-logo {
-            font-size: 55px;
+            font-size: clamp(42px, 8vw, 70px);
+
             font-weight: 900;
-            letter-spacing: 4px;
-            color: var(--text);
+
+            letter-spacing: 5px;
         }
 
         .welcome-logo span {
@@ -178,68 +279,166 @@
         }
 
         .welcome p {
+            margin-top: 12px;
+
             color: var(--muted);
+
             font-size: 16px;
+        }
+
+        .suggestions {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 10px;
+
+            max-width: 700px;
+
+            margin:
+                35px
+                auto
+                0;
+        }
+
+        .suggestion {
+            padding: 15px;
+
+            border-radius: 13px;
+
+            border: 1px solid var(--border);
+
+            background: var(--panel);
+
+            color: var(--text);
+
+            text-align: left;
+        }
+
+        .suggestion:hover {
+            border-color: var(--blue);
+            transform: translateY(-1px);
         }
 
         .message {
             max-width: 850px;
-            margin: 0 auto 22px;
-            padding: 17px 20px;
+
+            margin:
+                0
+                auto
+                18px;
+
+            padding:
+                16px
+                19px;
+
             border-radius: 16px;
-            line-height: 1.55;
+
+            line-height: 1.6;
+
             white-space: pre-wrap;
-            word-wrap: break-word;
+
+            word-break: break-word;
         }
 
         .user {
-            background: linear-gradient(135deg, #087cff, #00a8ed);
-            color: white;
+            width: fit-content;
+            max-width: 80%;
+
             margin-left: auto;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #087cff,
+                    #00a8ed
+                );
+
+            color: white;
         }
 
         .assistant {
             background: var(--panel);
-            border: 1px solid var(--border);
+
+            border:
+                1px solid
+                var(--border);
+
             margin-right: auto;
         }
 
+        .typing {
+            opacity: 0.7;
+        }
+
+        /* COMPOSER */
+
         .composer {
             position: fixed;
-            bottom: 0;
+
             left: 260px;
             right: 0;
-            padding: 18px 20px 22px;
-            background: linear-gradient(
-                transparent,
-                var(--bg) 25%
-            );
+            bottom: 0;
+
+            z-index: 15;
+
+            padding:
+                20px
+                20px
+                22px;
+
+            background:
+                linear-gradient(
+                    transparent,
+                    var(--bg) 30%
+                );
         }
 
         .composer-inner {
             max-width: 850px;
+
             margin: auto;
+
             display: flex;
+            align-items: flex-end;
+
             gap: 10px;
-            padding: 10px;
+
+            padding: 9px;
+
             background: var(--panel);
-            border: 1px solid var(--border);
+
+            border:
+                1px solid
+                var(--border);
+
             border-radius: 17px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+
+            box-shadow:
+                0 15px 45px
+                rgba(0, 0, 0, 0.25);
         }
 
         textarea {
             flex: 1;
+
             min-height: 48px;
             max-height: 180px;
+
             resize: none;
-            border: 0;
+
             outline: none;
+            border: 0;
+
             background: transparent;
+
             color: var(--text);
-            padding: 12px;
-            font-family: inherit;
-            font-size: 15px;
+
+            padding:
+                12px;
+
+            line-height: 1.4;
         }
 
         textarea::placeholder {
@@ -249,29 +448,680 @@
         .send {
             width: 48px;
             height: 48px;
+
+            flex-shrink: 0;
+
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--blue), var(--blue2));
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--blue2)
+                );
+
             color: white;
-            font-size: 20px;
+
+            font-size: 19px;
         }
 
         .send:disabled {
-            opacity: 0.5;
+            opacity: 0.45;
             cursor: not-allowed;
         }
 
+        /* MOBILE */
+
+        .mobile-header {
+            display: none;
+        }
+
         @media (max-width: 700px) {
+
             .sidebar {
                 display: none;
             }
 
-            .composer {
-                left: 0;
+            .main {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .mobile-header {
+                display: flex;
+
+                height: 60px;
+
+                align-items: center;
+                justify-content: space-between;
+
+                padding:
+                    0
+                    15px;
+
+                border-bottom:
+                    1px solid
+                    var(--border);
+            }
+
+            .mobile-logo {
+                font-weight: 900;
+                letter-spacing: 2px;
+            }
+
+            .mobile-logo span {
+                color: var(--blue2);
             }
 
             .topbar {
-                padding: 0 15px;
+                height: 52px;
+                min-height: 52px;
+
+                padding:
+                    0
+                    15px;
             }
 
             .chat {
-                padding-left: 12
+                padding:
+                    20px
+                    12px
+                    160px;
+            }
+
+            .welcome {
+                margin-top: 50px;
+            }
+
+            .welcome-logo {
+                font-size: 43px;
+            }
+
+            .welcome p {
+                font-size: 14px;
+            }
+
+            .suggestions {
+                grid-template-columns: 1fr;
+
+                margin-top: 25px;
+            }
+
+            .message {
+                max-width: 94%;
+            }
+
+            .user {
+                max-width: 90%;
+            }
+
+            .composer {
+                left: 0;
+
+                padding:
+                    10px
+                    10px
+                    14px;
+            }
+
+            .composer-inner {
+                border-radius: 15px;
+            }
+
+            textarea {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            MY<span>AI</span>
+        </div>
+
+        <button
+            class="new-chat"
+            id="newChat"
+        >
+            ＋ Новый чат
+        </button>
+
+        <div class="mode-title">
+            Режим
+        </div>
+
+        <button
+            class="mode active"
+            data-mode="chat"
+        >
+            💬 Чат
+        </button>
+
+        <button
+            class="mode"
+            data-mode="code"
+        >
+            💻 Создать приложение
+        </button>
+
+        <button
+            class="theme"
+            id="themeButton"
+        >
+            🌙 Тёмная тема
+        </button>
+
+    </aside>
+
+
+    <main class="main">
+
+        <div class="mobile-header">
+
+            <div class="mobile-logo">
+                MY<span>AI</span>
+            </div>
+
+            <button
+                id="mobileTheme"
+                title="Сменить тему"
+            >
+                🌙
+            </button>
+
+        </div>
+
+
+        <div class="topbar">
+
+            <div class="top-title">
+                MY AI
+            </div>
+
+            <div class="status">
+
+                <span class="dot"></span>
+
+                <span>
+                    AI онлайн
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <section
+            class="chat"
+            id="chat"
+        >
+
+            <div
+                class="welcome"
+                id="welcome"
+            >
+
+                <div class="welcome-logo">
+                    MY<span>AI</span>
+                </div>
+
+                <p id="welcomeText">
+                    Твой персональный AI-помощник
+                </p>
+
+                <div class="suggestions">
+
+                    <button
+                        class="suggestion"
+                        data-prompt="Создай простой современный сайт"
+                    >
+                        🌐 Создать сайт
+                    </button>
+
+                    <button
+                        class="suggestion"
+                        data-prompt="Напиши Telegram-бота на Python"
+                    >
+                        🤖 Создать Telegram-бота
+                    </button>
+
+                    <button
+                        class="suggestion"
+                        data-prompt="Объясни мне Python простыми словами"
+                    >
+                        🧠 Объяснить код
+                    </button>
+
+                    <button
+                        class="suggestion"
+                        data-prompt="Придумай идею приложения"
+                    >
+                        🚀 Придумать приложение
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="composer">
+
+            <div class="composer-inner">
+
+                <textarea
+                    id="messageInput"
+                    placeholder="Напиши сообщение..."
+                    rows="1"
+                ></textarea>
+
+                <button
+                    class="send"
+                    id="sendButton"
+                    title="Отправить"
+                >
+                    ➤
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    const chat =
+        document.getElementById("chat");
+
+    const welcome =
+        document.getElementById("welcome");
+
+    const input =
+        document.getElementById("messageInput");
+
+    const sendButton =
+        document.getElementById("sendButton");
+
+    const newChat =
+        document.getElementById("newChat");
+
+    const themeButton =
+        document.getElementById("themeButton");
+
+    const mobileTheme =
+        document.getElementById("mobileTheme");
+
+    const welcomeText =
+        document.getElementById("welcomeText");
+
+
+    let currentMode = "chat";
+
+
+    function addMessage(
+        text,
+        type
+    ) {
+
+        const message =
+            document.createElement("div");
+
+        message.className =
+            "message " + type;
+
+        message.textContent = text;
+
+        chat.appendChild(message);
+
+        chat.scrollTop =
+            chat.scrollHeight;
+
+        return message;
+    }
+
+
+    function showWelcome() {
+
+        if (!welcome) {
+            return;
+        }
+
+        welcome.style.display =
+            "block";
+    }
+
+
+    function hideWelcome() {
+
+        if (!welcome) {
+            return;
+        }
+
+        welcome.style.display =
+            "none";
+    }
+
+
+    async function sendMessage(
+        customMessage = null
+    ) {
+
+        const message =
+            customMessage !== null
+                ? customMessage.trim()
+                : input.value.trim();
+
+        if (!message) {
+            return;
+        }
+
+        hideWelcome();
+
+        addMessage(
+            message,
+            "user"
+        );
+
+        input.value = "";
+
+        input.style.height =
+            "48px";
+
+        sendButton.disabled =
+            true;
+
+        const typing =
+            addMessage(
+                "MY AI печатает...",
+                "assistant typing"
+            );
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/chat",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            message:
+                                currentMode === "code"
+                                    ? "Режим создания приложения. Пользователь просит: " + message
+                                    : message
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            typing.remove();
+
+            if (!response.ok) {
+
+                addMessage(
+                    "Ошибка: " +
+                    (
+                        data.error ||
+                        "Неизвестная ошибка"
+                    ),
+                    "assistant"
+                );
+
+                return;
+            }
+
+            addMessage(
+                data.answer ||
+                "AI не вернул ответ.",
+                "assistant"
+            );
+
+        } catch (error) {
+
+            typing.remove();
+
+            addMessage(
+                "Не удалось подключиться к серверу MY AI.",
+                "assistant"
+            );
+
+        } finally {
+
+            sendButton.disabled =
+                false;
+
+            input.focus();
+        }
+    }
+
+
+    sendButton.addEventListener(
+        "click",
+        () => sendMessage()
+    );
+
+
+    input.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                sendMessage();
+            }
+
+        }
+    );
+
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            input.style.height =
+                "48px";
+
+            input.style.height =
+                Math.min(
+                    input.scrollHeight,
+                    180
+                ) + "px";
+        }
+    );
+
+
+    document
+        .querySelectorAll(".mode")
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        document
+                            .querySelectorAll(".mode")
+                            .forEach(
+                                item =>
+                                    item.classList.remove(
+                                        "active"
+                                    )
+                            );
+
+                        button.classList.add(
+                            "active"
+                        );
+
+                        currentMode =
+                            button.dataset.mode;
+
+                        if (
+                            currentMode ===
+                            "code"
+                        ) {
+
+                            input.placeholder =
+                                "Опиши приложение, которое нужно создать...";
+
+                            welcomeText.textContent =
+                                "Опиши идею — MY AI поможет спроектировать приложение";
+
+                        } else {
+
+                            input.placeholder =
+                                "Напиши сообщение...";
+
+                            welcomeText.textContent =
+                                "Твой персональный AI-помощник";
+                        }
+                    }
+                );
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(".suggestion")
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        input.value =
+                            button.dataset.prompt;
+
+                        input.focus();
+
+                        sendMessage();
+                    }
+                );
+
+            }
+        );
+
+
+    function toggleTheme() {
+
+        document.body.classList.toggle(
+            "light"
+        );
+
+        const light =
+            document.body.classList.contains(
+                "light"
+            );
+
+        localStorage.setItem(
+            "myai-theme",
+            light
+                ? "light"
+                : "dark"
+        );
+
+        updateThemeButtons();
+    }
+
+
+    function updateThemeButtons() {
+
+        const light =
+            document.body.classList.contains(
+                "light"
+            );
+
+        if (themeButton) {
+
+            themeButton.textContent =
+                light
+                    ? "☀️ Светлая тема"
+                    : "🌙 Тёмная тема";
+        }
+
+        if (mobileTheme) {
+
+            mobileTheme.textContent =
+                light
+                    ? "☀️"
+                    : "🌙";
+        }
+    }
+
+
+    themeButton.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+
+    mobileTheme.addEventListener(
+        "click",
+        toggleTheme
+    );
+
+
+    newChat.addEventListener(
+        "click",
+        () => {
+
+            chat.innerHTML = "";
+
+            chat.appendChild(
+                welcome
+            );
+
+            welcome.style.display =
+                "block";
+
+            input.value = "";
+
+            input.focus();
+        }
+    );
+
+
+    const savedTheme =
+        localStorage.getItem(
+            "myai-theme"
+        );
+
+    if (
+        savedTheme === "light"
+    ) {
+
+        document.body.classList.add(
+            "light"
+        );
+    }
+
+    updateThemeButtons();
+
+</script>
+
+</body>
+    </html>
